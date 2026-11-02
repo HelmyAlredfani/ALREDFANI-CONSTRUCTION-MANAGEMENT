@@ -1,4 +1,4 @@
 Options -Indexes
-<FilesMatch "^(.*\.sql|.*\.example\.php|README\.md)$">
+<FilesMatch "^(.*\\.sql|.*\\.example\\.php|local\\.php|README\\.md|.*\\.log)$">
 Require all denied
 </FilesMatch>

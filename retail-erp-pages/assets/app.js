@@ -4,7 +4,7 @@ const blank=()=>({version:2,settings:{business:'ALREDFANI RETAIL ERP',currency:'
 function normalize(d){['products','sales','customers','suppliers','expenses','movements'].forEach(k=>{if(!Array.isArray(d[k]))d[k]=[]});d.settings=d.settings||{business:'ALREDFANI RETAIL ERP',currency:'YER'};return d}
 function load(){try{let d=JSON.parse(localStorage.getItem(KEY));if(d&&d.version===2)return normalize(d);let old=JSON.parse(localStorage.getItem(OLD));if(old&&Array.isArray(old.products)){d=blank();d.products=old.products.map(p=>({id:String(p.id||id()),name:p.name||'',sku:p.sku||'',barcode:p.barcode||'',category:'عام',unit:'حبة',cost:n(p.cost),price:n(p.price),qty:n(p.qty),alert:n(p.alert),active:true}));d.sales=(old.sales||[]).map(s=>({...s,id:id(),date:s.date||today(),subtotal:n(s.total),discount:0,total:n(s.total),items:s.items||[]}));localStorage.setItem(KEY,JSON.stringify(d));return d}return blank()}catch(e){return blank()}}
 let db=load(),cart=new Map(),current='home',editing=null;
-function save(){try{localStorage.setItem(KEY,JSON.stringify(db));return true}catch(e){toast('تعذر الحفظ؛ مساحة التخزين قد تكون ممتلئة.');return false}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db));if(window.AlredfaniCloud)window.AlredfaniCloud.queueSave(db);return true}catch(e){toast('تعذر الحفظ؛ مساحة التخزين قد تكون ممتلئة.');return false}}
 function money(v){return n(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' '+esc(db.settings.currency||'YER')}
 function toast(s){let t=$('#toast');t.textContent=s;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),2800)}
 const titles={home:'لوحة التحكم',products:'إدارة المنتجات',pos:'نقطة البيع',sales:'المبيعات والفواتير',inventory:'إدارة المخزون',customers:'العملاء',suppliers:'الموردون',expenses:'المصروفات',reports:'التقارير والتحليلات',backup:'النسخ الاحتياطي والإعدادات'};
@@ -65,4 +65,6 @@ if(f.id==='settingsForm'){db.settings.business=String(d.get('business')).trim();
 $('#modal').addEventListener('click',e=>{if(e.target.id==='modal'||e.target.closest('[data-close]'))closeModal()});
 $('#globalSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){page('products');let x=$('#productSearch');x.value=e.target.value;x.dispatchEvent(new Event('input'))}});
 render();page('home');
+window.AlredfaniERP={getData:()=>db,replaceData:(data)=>{db=normalize(data);try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}render();page('home')},notify:(message)=>toast(message)};
+if(window.AlredfaniCloud)window.AlredfaniCloud.start(window.AlredfaniERP);
 })();
