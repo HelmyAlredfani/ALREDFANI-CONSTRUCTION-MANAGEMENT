@@ -24,6 +24,17 @@ jobs:
       - uses: actions/checkout@v4
       - name: Verify entry point
         run: test -s retail-erp-pages/index.html
+      - name: Check JavaScript syntax
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          html = Path('retail-erp-pages/index.html').read_text(encoding='utf-8')
+          scripts = re.findall(r'<script>(.*?)</script>', html, re.S)
+          assert scripts, 'No inline application script found'
+          Path('/tmp/retail-erp-pages.js').write_text('\n'.join(scripts), encoding='utf-8')
+          PY
+          node --check /tmp/retail-erp-pages.js
       - uses: actions/upload-pages-artifact@v3
         with:
           path: retail-erp-pages
