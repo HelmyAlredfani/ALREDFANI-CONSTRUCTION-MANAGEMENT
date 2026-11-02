@@ -1,0 +1,20 @@
+name: Retail ERP PHP syntax
+on:
+  push:
+    paths:
+      - 'retail-erp/**/*.php'
+      - '.github/workflows/retail-php-lint.yml'
+  pull_request:
+    paths:
+      - 'retail-erp/**/*.php'
+      - '.github/workflows/retail-php-lint.yml'
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - name: PHP syntax check
+        run: find retail-erp -name '*.php' -print0 | xargs -0 -n1 php -l
