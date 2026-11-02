@@ -172,4 +172,48 @@ grant select, insert, update, delete on
   public.user_branch_access
 to authenticated;
 
+
+-- Enforce same-workspace membership and branch ownership for assignments.
+create unique index if not exists branches_workspace_id_id_key
+  on public.branches(workspace_id, id);
+create unique index if not exists workspace_members_workspace_user_key
+  on public.workspace_members(workspace_id, user_id);
+
+do $
+begin
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'user_permissions_workspace_member_fk'
+      and conrelid = 'public.user_permissions'::regclass
+  ) then
+    alter table public.user_permissions
+      add constraint user_permissions_workspace_member_fk
+      foreign key (workspace_id, user_id)
+      references public.workspace_members(workspace_id, user_id)
+      on delete cascade;
+  end if;
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'user_branch_access_workspace_member_fk'
+      and conrelid = 'public.user_branch_access'::regclass
+  ) then
+    alter table public.user_branch_access
+      add constraint user_branch_access_workspace_member_fk
+      foreign key (workspace_id, user_id)
+      references public.workspace_members(workspace_id, user_id)
+      on delete cascade;
+  end if;
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'user_branch_access_workspace_branch_fk'
+      and conrelid = 'public.user_branch_access'::regclass
+  ) then
+    alter table public.user_branch_access
+      add constraint user_branch_access_workspace_branch_fk
+      foreign key (workspace_id, branch_id)
+      references public.branches(workspace_id, id)
+      on delete cascade;
+  end if;
+end $;
+
 commit;
