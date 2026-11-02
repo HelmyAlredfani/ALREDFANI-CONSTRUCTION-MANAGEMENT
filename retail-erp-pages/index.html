@@ -12,7 +12,7 @@
 <div class="app">
 <header class="topbar">
   <div class="brand"><div class="brandmark">A</div><div><span id="businessName">ALREDFANI RETAIL ERP</span><small>RETAIL MANAGEMENT SUITE</small></div></div>
-  <div class="top-actions"><input id="globalSearch" aria-label="بحث سريع" placeholder="بحث سريع ثم Enter" style="width:190px;border:1px solid #e1e8ef;border-radius:10px;padding:9px 11px"><span class="local-pill">نسخة محلية تجريبية</span><span class="user-chip">مدير المتجر</span></div>
+  <div class="top-actions"><input id="globalSearch" aria-label="بحث سريع" placeholder="بحث سريع ثم Enter" style="width:190px;border:1px solid #e1e8ef;border-radius:10px;padding:9px 11px"><span class="local-pill" id="cloudStatus">بانتظار تسجيل الدخول</span><span class="user-chip">مدير المتجر</span></div>
 </header>
 <div class="layout">
 <aside class="sidebar">
@@ -32,7 +32,7 @@
   <div class="side-foot">ALREDFANI RETAIL ERP<br>GitHub Pages Edition · v2.0<br>إدارة أكثر وضوحاً، وقرارات أفضل.</div>
 </aside>
 <main>
-<div class="notice"><span class="notice-icon">⚠</span><div><strong>تنبيه تشغيلي مهم</strong>هذه نسخة GitHub Pages محلية. تحفظ البيانات في المتصفح والجهاز الحالي فقط، ولا تتضمن تسجيل دخول أو قاعدة بيانات مشتركة أو تحققاً خادمياً. خذ نسخة احتياطية بانتظام، ولا تستخدمها كسجل تجاري رسمي أو لحفظ بيانات حساسة قبل ربطها بخادم وقاعدة بيانات آمنة.</div></div>
+<div class="notice"><span class="notice-icon">☁</span><div><strong>الاتصال السحابي</strong>يلزم تسجيل الدخول للمتابعة. تُحفظ بيانات هذه المرحلة في نسخة سحابية واحدة لمساحة العمل؛ لا تستخدم الحساب نفسه بالتزامن من عدة أجهزة حتى تكتمل مزامنة السجلات والمعاملات.</div></div>
 <div class="page-head"><div><div class="eyebrow">WORKSPACE</div><h1 id="pageTitle">لوحة التحكم</h1><p>منصة إدارة البيع بالتجزئة</p></div></div>
 <section id="page-home" class="page active"></section>
 <section id="page-products" class="page"></section>
@@ -49,7 +49,22 @@
 <footer>ALREDFANI RETAIL ERP · Professional GitHub Pages Edition · v2.0</footer>
 </div>
 <div class="modal-backdrop" id="modal"><div class="modal"><div class="modal-head"><h2 id="modalTitle">تفاصيل</h2><button class="modal-close" data-close>إغلاق ×</button></div><div id="modalBody"></div></div></div>
+<div id="cloudAuth" style="position:fixed;inset:0;z-index:99999;background:#0b1e2acc;display:flex;align-items:center;justify-content:center;padding:18px;font-family:Tahoma,Arial,sans-serif">
+ <section style="width:min(430px,100%);background:#fff;color:#172b36;border-radius:18px;padding:26px;box-shadow:0 20px 70px #0005" dir="rtl">
+  <div style="font-size:12px;letter-spacing:2px;color:#607d8b">ALREDFANI RETAIL ERP</div>
+  <h2 style="margin:8px 0 6px">تسجيل الدخول</h2>
+  <p id="cloudAuthMessage" style="color:#607d8b;line-height:1.7">سجّل الدخول بحساب Supabase للمتابعة إلى مساحة العمل.</p>
+  <form id="cloudLoginForm">
+   <label style="display:block;margin:12px 0 5px">البريد الإلكتروني</label><input id="cloudEmail" type="email" required autocomplete="username" style="box-sizing:border-box;width:100%;padding:12px;border:1px solid #ccd8df;border-radius:9px">
+   <label style="display:block;margin:12px 0 5px">كلمة المرور</label><input id="cloudPassword" type="password" required autocomplete="current-password" style="box-sizing:border-box;width:100%;padding:12px;border:1px solid #ccd8df;border-radius:9px">
+   <button id="cloudLoginButton" type="submit" style="width:100%;margin-top:18px;padding:13px;border:0;border-radius:9px;background:#123d4b;color:#fff;font-weight:bold">دخول آمن</button>
+  </form>
+  <button id="cloudLogoutButton" type="button" hidden style="margin-top:12px;padding:9px 12px;border:1px solid #ccd8df;border-radius:9px;background:#fff">تسجيل الخروج</button>
+ </section>
+</div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="assets/app.js?v=2" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/supabase-cloud.js?v=1" defer></script>
+<script src="assets/app.js?v=3" defer></script>
 </body>
 </html>
