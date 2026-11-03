@@ -179,7 +179,7 @@ create unique index if not exists branches_workspace_id_id_key
 create unique index if not exists workspace_members_workspace_user_key
   on public.workspace_members(workspace_id, user_id);
 
-do $
+do $$
 begin
   if not exists (
     select 1 from pg_constraint
@@ -214,6 +214,6 @@ begin
       references public.branches(workspace_id, id)
       on delete cascade;
   end if;
-end $;
+end $$;
 
 commit;
