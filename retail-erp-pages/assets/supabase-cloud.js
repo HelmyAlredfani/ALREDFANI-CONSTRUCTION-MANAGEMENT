@@ -62,5 +62,30 @@ async function start(api){
  else {$('cloudAuth').style.display='flex';status('بانتظار تسجيل الدخول');}
  client.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT'){ready=false;workspaceId=null;$('cloudAuth').style.display='flex';status('تم تسجيل الخروج');}});
 }
-window.AlredfaniCloud={start,queueSave};
+
+async function loadAdmin(){
+ if(!ready||!workspaceId)throw new Error('يجب تسجيل الدخول أولاً');
+ const [members,roles,catalog,permissions]=await Promise.all([
+  client.from('workspace_members').select('user_id,role,role_id').eq('workspace_id',workspaceId),
+  client.from('workspace_roles').select('id,name,role_key,is_system').eq('workspace_id',workspaceId).order('name'),
+  client.from('permission_catalog').select('permission_key,module,action,description').order('module').order('permission_key'),
+  client.from('role_permissions').select('role_id,permission_key,allowed').eq('workspace_id',workspaceId)
+ ]);
+ for(const x of [members,roles,catalog,permissions])if(x.error)throw x.error;
+ return {members:members.data||[],roles:roles.data||[],catalog:catalog.data||[],rolePermissions:permissions.data||[]};
+}
+async function assignRole(userId,roleId){
+ if(!ready||!workspaceId)throw new Error('غير متصل');
+ const role=(await client.from('workspace_roles').select('role_key').eq('workspace_id',workspaceId).eq('id',roleId).single());
+ if(role.error)throw role.error;
+ const legacy=({owner:'owner',general_manager:'manager',branch_manager:'manager',accountant:'other',cashier:'cashier',stockkeeper:'other',custom:'other'})[role.data.role_key]||'other';
+ const {error}=await client.from('workspace_members').update({role_id:roleId,role:legacy}).eq('workspace_id',workspaceId).eq('user_id',userId);
+ if(error)throw error;
+}
+async function setRolePermission(roleId,key,allowed){
+ if(!ready||!workspaceId)throw new Error('غير متصل');
+ const {error}=await client.from('role_permissions').upsert({workspace_id:workspaceId,role_id:roleId,permission_key:key,allowed},{onConflict:'workspace_id,role_id,permission_key'});
+ if(error)throw error;
+}
+window.AlredfaniCloud={start,queueSave,admin:{loadAdmin,assignRole,setRolePermission}};
 })();
